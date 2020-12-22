@@ -221,6 +221,9 @@ guint obt_keyboard_only_modmasks(guint mask)
 
 guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key)
 {
+    if (key == OBT_KEYBOARD_MODKEY_RELEASE) {
+        return ReleaseMask;
+    }
     return modkeys_keys[key];
 }
 

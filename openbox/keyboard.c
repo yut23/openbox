@@ -227,18 +227,20 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     if (e->type == KeyRelease) {
         grab_key_passive_count(-1);
         repeat_key = 0;
-        return FALSE;
+    } else {
+        g_assert(e->type == KeyPress);
+        grab_key_passive_count(1);
+
+        if (repeat_key == e->xkey.keycode)
+            repeating = TRUE;
+        else
+            repeat_key = e->xkey.keycode;
     }
 
-    g_assert(e->type == KeyPress);
-    grab_key_passive_count(1);
-
-    if (repeat_key == e->xkey.keycode)
-        repeating = TRUE;
-    else
-        repeat_key = e->xkey.keycode;
-
     mods = obt_keyboard_only_modmasks(e->xkey.state);
+    if (e->type == KeyRelease) {
+        mods |= obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_RELEASE);
+    }
 
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         mods == config_keyboard_reset_state)

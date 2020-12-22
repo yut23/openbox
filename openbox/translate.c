@@ -129,6 +129,13 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
         *state |= m;
     }
 
+    /* check for release binding (key prefixed with @) */
+    if (!g_ascii_strncasecmp("@", l, 1)) {
+        *state |= obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_RELEASE);
+        /* skip the @ sign */
+        l++;
+    }
+
     if (!g_ascii_strncasecmp("0x", l, 2)) {
         gchar *end;
 

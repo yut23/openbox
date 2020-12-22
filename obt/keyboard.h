@@ -38,9 +38,13 @@ typedef enum {
     OBT_KEYBOARD_MODKEY_HYPER,
     OBT_KEYBOARD_MODKEY_META,
     OBT_KEYBOARD_MODKEY_ALT,
+    OBT_KEYBOARD_MODKEY_RELEASE,
 
     OBT_KEYBOARD_NUM_MODKEYS
 } ObtModkeysKey;
+/* This is kind of a hack, but lets me re-use the existing code instead of
+   having to add a case wherever a key is checked against a binding */
+#define ReleaseMask (1<<8)
 
 typedef struct _ObtIC ObtIC;
 

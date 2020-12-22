@@ -211,6 +211,7 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
 {
     guint i;
 
+    state &= ~obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_RELEASE);
     /* can get BadAccess' from these */
     obt_display_ignore_errors(TRUE);
     for (i = 0; i < MASK_LIST_SIZE; ++i)
