@@ -4281,7 +4281,7 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 
 guint client_monitor(ObClient *self)
 {
-    return screen_find_monitor(&self->frame->area);
+    return self->monitor;
 }
 
 ObClient *client_direct_parent(ObClient *self)
