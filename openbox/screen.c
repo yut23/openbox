@@ -1367,12 +1367,30 @@ typedef struct {
     } \
 }
 
+static gboolean XRRGetMonitors_is_supported()
+{
+#ifdef XRANDR
+    if (!obt_display_extension_randr)
+        return FALSE;
+    gint major = 0, minor = 0;
+    if (XRRQueryVersion(obt_display, &major, &minor)) {
+        return major > 1 || (major == 1 && minor >= 5);
+    }
+#endif
+    return FALSE;
+}
+
 static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
 {
     guint i;
     gint l, r, t, b;
-#ifdef XINERAMA
+#if defined(XRANDR) || defined(XINERAMA)
     gint n;
+#endif
+#ifdef XRANDR
+    XRRMonitorInfo *rr_monitors;
+#endif
+#ifdef XINERAMA
     XineramaScreenInfo *info;
 #endif
 
@@ -1384,6 +1402,20 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
         RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
         RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
     }
+#ifdef XRANDR
+    else if (obt_display_extension_randr &&
+             XRRGetMonitors_is_supported() &&
+             (rr_monitors = XRRGetMonitors(obt_display, obt_root(ob_screen), 1, &n)) &&
+             n > 0) {
+        *nxin = n;
+        *xin_areas = g_new(Rect, *nxin + 1);
+        for (i = 0; i < *nxin; ++i) {
+            RECT_SET((*xin_areas)[i], rr_monitors[i].x, rr_monitors[i].y,
+                     rr_monitors[i].width, rr_monitors[i].height);
+        }
+        XRRFreeMonitors(rr_monitors);
+    }
+#endif
 #ifdef XINERAMA
     else if (obt_display_extension_xinerama &&
              XineramaIsActive(obt_display) &&
